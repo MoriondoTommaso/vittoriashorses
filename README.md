@@ -1,7 +1,7 @@
 # Vittoria's Horses
 
 One page, no router, no store. Vite + React 18 + TypeScript + Tailwind 3, published
-as static files on GitHub Pages.
+as static files on GitHub Pages, served at `vittoriashorses.it`.
 
 The page is one continuous journey rather than a set of sections: a horse moves
 from standing to walk to trot to gallop across a single shared video stage, and then
@@ -21,6 +21,40 @@ npm run preview    # serve dist/
 `vite.config.ts` sets `base: './'`, so the build works from a root domain or
 from a project subpath. Both `index.html` and `privacy.html` are entry points
 and both end up in `dist/`.
+
+## Publishing
+
+Push to `main`. `.github/workflows/deploy.yml` builds and deploys to GitHub
+Pages; there is no `dist/` branch and no committed build output.
+
+The build runs on the runner rather than publishing a committed `dist/`,
+because the published media is already in `public/media/` and a second copy of
+32 MB of assets would exist only to be uploaded again on every push. For the
+same reason the workflow needs no `ffmpeg` and no `cwebp`: it runs `npm ci` and
+`npm run build`, nothing else. The typecheck is inside `npm run build` because
+that is where it lives locally, and a deploy that skipped the check the
+developer runs would not be the same deploy.
+
+The repository tracks only what the build reads: `src/`, `public/`, the two
+entry points, the four config files and `package.json`. `videos/`,
+`maneggio_pictures/` and `logo/` are the inputs of the two build scripts, and
+`figure/` and `assets/` are from the earlier version; excluding them takes the
+repository from 165 MB to 30 MB and changes not one byte of `dist/`, which was
+verified by building from a clean checkout and diffing. The consequence is
+stated rather than hidden: **`npm run media` and `npm run gallery` do not run
+from a fresh clone.** That is deliberate, because regenerating the published
+media is an act on a working copy, not something a deploy does, but it does
+mean the originals in `videos/` and `maneggio_pictures/` have to be kept
+somewhere safe. They are not in this repository.
+
+The checks under `npm run review:*` are local and are not part of the deploy.
+Playwright and Lighthouse would add minutes and a class of failure to a site
+that has not changed. All four take a base URL, so they can be pointed at the
+deployed site rather than at `npm run preview`:
+
+```bash
+npm run review https://moriondotommaso.github.io/vittoriashorses/
+```
 
 ## The page
 
