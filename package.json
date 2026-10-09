@@ -1,0 +1,41 @@
+{
+  "name": "vittorias-horses",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "media": "node scripts/build-media.mjs",
+    "gallery": "node scripts/build-gallery.mjs",
+    "review": "node checks/review.mjs",
+    "review:a11y": "node checks/axe.mjs",
+    "review:contrast": "node checks/contrast.mjs",
+    "review:fallbacks": "node checks/fallbacks.mjs",
+    "review:perf": "node checks/lh.mjs",
+    "review:all": "npm run review && npm run review:a11y && npm run review:contrast && npm run review:fallbacks && npm run review:perf"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@types/node": "^26.6.3",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "autoprefixer": "^10.6.1",
+    "axe-core": "^4.13.0",
+    "chrome-launcher": "^1.2.0",
+    "lighthouse": "^13.5.0",
+    "playwright": "^1.63.0",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21"
+  },
+  "dependencies": {
+    "lucide-react": "^1.49.0",
+    "motion": "^14.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "private": true
+}

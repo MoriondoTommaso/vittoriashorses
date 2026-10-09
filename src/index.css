@@ -1,0 +1,1278 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Two families, self-hosted, latin subset.
+
+   Relative so Vite fingerprints and rewrites them for any deploy base.
+
+   Self-hosted rather than linked from a font service, for three reasons that are
+   all about the visit rather than about taste: the page makes no request to a
+   third party while somebody is reading it, the two files are in the first group
+   of preloadable requests in index.html rather than discovered one round trip
+   late through a stylesheet, and the licence travels with the file.
+
+   `latin` covers Italian completely: the accented vowels are in U+0000-00FF and
+   the typographic apostrophe in Vittoria’s is U+2019, inside U+2000-206F. No
+   latin-ext file is carried, because nothing on this site needs one and it would
+   be bytes spent on glyphs that are never drawn.
+
+   Alfa Slab One ships a single weight. It is declared as 400 and used at 400;
+   nothing anywhere applies a weight to it, because there is nothing to apply.
+
+   Plus Jakarta Sans is a variable file, so 400 and 600 are two positions on one
+   axis rather than two files. That is why this is one @font-face and not two. */
+@font-face {
+  font-family: 'Alfa Slab One';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/alfa-slab-one-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('./fonts/plus-jakarta-sans-latin.woff2') format('woff2');
+}
+
+@layer base {
+  /* ── Semantic tokens ─────────────────────────────────────────────────────
+     One accent, forest green. Both themes are defined here rather than in the
+     Tailwind config so privacy.html, which loads this file without React,
+     reads exactly the same values. Contrast is measured against what these
+     resolve to, by checks/contrast.mjs.
+
+     The neutrals sit in one warm family, hue 29 to 85, because the page is sand:
+     a cool grey next to a warm ground reads as a different surface rather than as
+     a lighter or darker version of the same one. The accent keeps its green,
+     because green is the one colour on this site that means the maneggio.
+
+     The media pair is theme-independent on purpose: the hero photograph looks
+     the same in both themes, so its scrim and its type must not shift. */
+  :root {
+    color-scheme: light dark;
+
+    --page: oklch(0.977 0.0075 85);
+    --surface: oklch(0.991 0.004 85);
+    --text: oklch(0.2737 0.0078 29);
+    --muted: oklch(0.462 0.013 40);
+    --accent: oklch(0.415 0.072 158);
+    --on-accent: oklch(0.985 0.004 155);
+    /* Alpha lives in the token, because Tailwind's /modifier does nothing on a
+       var() colour. */
+    --line: oklch(0.2737 0.0078 29 / 0.14);
+    --line-strong: oklch(0.2737 0.0078 29 / 0.26);
+
+    --media-text: oklch(0.985 0.004 155);
+    --media-scrim: oklch(0.16 0.022 235 / 0.58);
+
+    /* Strong ease-out for anything entering or responding on screen. The
+       built-in easings are too weak: they read as sluggish next to the same
+       duration on a real curve. */
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: oklch(0.192 0.016 45);
+      --surface: oklch(0.242 0.016 45);
+      --text: oklch(0.955 0.006 60);
+      --muted: oklch(0.762 0.012 55);
+      --accent: oklch(0.775 0.105 158);
+      --on-accent: oklch(0.2 0.02 158);
+      --line: oklch(0.955 0.006 60 / 0.16);
+      --line-strong: oklch(0.955 0.006 60 / 0.3);
+    }
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    /* Keeps the layout from jumping sideways when a dialog locks the scroll. */
+    scrollbar-gutter: stable;
+  }
+
+  /* showModal() already blocks the page behind a dialog in current browsers;
+     this makes it certain, and it restores itself when the dialog closes
+     because there is no JS keeping a copy of the previous overflow value. */
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+
+  body {
+    @apply bg-page font-sans text-ink antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Headings are split by role, not by level of importance alone.
+
+     h1 and h2 are the brand voice: Alfa Slab One, weight 400 (the only weight
+     the file has), set in caps. h3 is the top of the reading hierarchy and
+     stays in Plus Jakarta Sans at 600, because a question heading in a slab
+     reads as a sign and there are four of them in the FAQ.
+
+     No letter-spacing is inherited here. The slab is a wide, low-contrast face
+     and it needs positive tracking to sit together at display sizes; the
+     sans-serif wants none at all. Both values live on the roles that use them,
+     in .wordmark, .story-title, .section-title and .pill--cta.
+
+     Sizes are not set here either. Each heading role has its own scale below,
+     because the name, an experience title and a section title are three
+     different jobs and they are not three steps of one ramp. */
+  h1,
+  h2 {
+    @apply font-display text-ink;
+    font-weight: 400;
+    text-wrap: balance;
+  }
+
+  h3 {
+    @apply font-sans text-ink;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* The skip target takes programmatic focus without joining the Tab order. */
+  #contenuto:focus {
+    outline: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  /* On a photograph the accent outline would sit on an unknown colour, so the
+     media surface declares its own. */
+  .on-media :focus-visible {
+    outline-color: var(--media-text);
+  }
+}
+
+@layer components {
+  /* 16px at 320, 24px from 480, 32px from 768, 48px from 1280. */
+  .shell {
+    @apply mx-auto w-full max-w-shell px-4 min-[480px]:px-6 md:px-8 min-[1280px]:px-12;
+  }
+
+  .section {
+    @apply py-16 md:py-24 min-[1280px]:py-28;
+  }
+
+  /* Anchors clear the sticky header instead of landing under it. */
+  .anchor {
+    scroll-margin-top: 5.5rem;
+  }
+
+  /* Controls only. Photography stays square-edged, which is what makes the
+     photographs and the buttons read as two different materials.
+
+     Jakarta by default, because this class is also the lightbox pager and the
+     skip link: controls are read, not announced. The brand face arrives through
+     .pill--cta, which is applied only to the three things on this site that ask
+     the visitor to act. */
+  .pill {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-control px-6 text-sm font-medium no-underline;
+    transition: transform 120ms var(--ease-out), background-color 180ms, color 180ms,
+      border-color 180ms;
+  }
+  .pill:active {
+    transform: scale(0.98);
+  }
+  /* An icon is never the thing that gives way. Without this a long label in
+     Alfa Slab One at 15px squeezes the arrow rather than the words, and the
+     result is a control whose meaning changed shape. */
+  .pill > svg {
+    flex-shrink: 0;
+  }
+  /* The three primary actions: the two experiences and the closing. Slab, caps,
+     0.03em. Tracking is looser here than on the titles because a button label is
+     short and set small, and 0.01em at 15px leaves the letters looking pushed
+     together; the reverse is true at 56px. */
+  .pill--cta {
+    @apply font-display uppercase;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    font-size: clamp(0.875rem, 0.83rem + 0.2vw, 0.9375rem);
+    line-height: 1.25;
+    /* One line, always. A wrapped button label is a broken button, and the
+       label is not negotiable enough to allow it. */
+    white-space: nowrap;
+  }
+  .pill--solid {
+    @apply bg-accent text-on-accent;
+  }
+  .pill--line {
+    @apply border border-line-strong text-ink;
+  }
+  /* On imagery the accent cannot carry the contrast, so the control inverts. */
+  .pill--media {
+    @apply bg-media-text text-[oklch(0.22_0.02_235)];
+  }
+  .pill--outline-media {
+    @apply border border-[oklch(0.985_0.004_155/0.55)] text-media-text;
+  }
+
+  .label {
+    @apply text-xs font-medium uppercase tracking-[0.2em];
+  }
+
+  /* Body links carry an underline: colour alone fails WCAG 1.4.1 for anyone who
+     cannot distinguish the green from the grey. */
+  .prose-link {
+    @apply text-accent underline underline-offset-2;
+  }
+
+  /* A translucent accent wash, for the surfaces that need to sit on a
+     photograph without becoming a panel. */
+  .wash {
+    background-color: color-mix(in oklab, var(--accent) 12%, transparent);
+  }
+}
+
+@layer components {
+  /* Section rules. One hairline, never a border around each item. */
+  .rule {
+    @apply border-t border-line;
+  }
+}
+
+/* ── The story stage ───────────────────────────────────────────────────────
+   One backdrop for the whole journey.
+
+   The stage is a sticky full-height box that comes first in the document, and the
+   content that scrolls over it starts one stage-height higher, pulled up by a
+   negative margin of exactly the same size. So while the reader scrolls, the video
+   stays and the words move, and neither of them is inside a scroll container of its
+   own.
+
+   That negative margin is on the *content's top*, and it has to be. It used to be on
+   the stage's bottom, which lays out identically, and which quietly cost a whole
+   screen of the page after the story.
+
+   Sticky positioning constrains an element's *margin box* to its containing block,
+   not its border box. A -100dvh bottom margin makes that margin box a full viewport
+   taller than the visible stage, so the stage is allowed to sit a full viewport
+   below the end of its container: it overhangs by exactly the amount it was
+   shortened by. With the gallery and the closing inside the story that overhang was
+   invisible, because they were inside the container the stage was pinned to. With
+   them outside it, as they are now, the stage hangs over the first screen of the
+   page and its veil, which is opaque and exactly the colour of the page, paints
+   over the photographs without a trace.
+
+   The same pull-up on the content's top produces the same layout and leaves the
+   stage's margin box equal to its border box, so the stage stops where the story
+   stops. Two adjacent vertical margins still collapse here, and collapsing a zero
+   with a negative gives the negative, which is the intent.
+
+   #racconto also clips. Redundant with the margin fix, and kept deliberately: it is
+   the guarantee rather than the mechanism, and `overflow: clip` does not create a
+   scroll container, so it cannot stop the stage sticking. */
+
+#racconto {
+  overflow: clip;
+}
+
+.story-stage {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  height: 100dvh;
+  overflow: hidden;
+  background-color: oklch(0.16 0.022 235);
+}
+
+/* The chapters sit above the stage. Without this the sticky box, being
+   positioned, would paint over the text it is supposed to be behind: a
+   positioned element paints above a non-positioned one whatever the document
+   order says. */
+.story-content {
+  position: relative;
+  z-index: 1;
+  margin-top: -100dvh;
+}
+
+/* The exit runway.
+
+   A chapter is a full screen tall, so the last panel is still comfortably inside
+   the viewport when the last chapter ends. Something has to be scrollable after
+   that panel, or the story would end while the reader is still looking at it and
+   the gallery would appear on top of a sentence.
+
+   This is that something: an empty, aria-hidden, correctly sized gap between the
+   last chapter and the end of the story. It is measured, not declared. The
+   measurement reads where the last panel's bottom edge actually is inside its own
+   chapter, and adds the length of the dissolve plus a short settle, which is why
+   its height is written from useStoryStage and not written here. Nothing is ever
+   drawn in it: the video is still on screen underneath for the first part of it,
+   and by the second part the veil has made it the page.
+
+   It is inside .story-content rather than after the stage, because the stage is
+   only pinned for as long as its container lasts. A gap placed after it would
+   simply push the stage up and out of view, which is a hard edge rather than a
+   dissolve. */
+.story-exit {
+  height: 0;
+  pointer-events: none;
+}
+
+/* The veil: the page's own colour, rising over the video as the last moment
+   finishes and the gallery arrives.
+
+   It is solid, and that is the point. A gradient can soften the lower edge of the
+   video, and it can make the bottom of the frame a known colour, but it cannot
+   make the *whole* frame a known colour, and the gallery's own text needs to be
+   read against something known. So the softness comes from the scrim underneath,
+   which is static, and the veil itself is a flat dissolve whose opacity follows
+   the scroll. By the time it is fully up the stage is indistinguishable from the
+   page behind it.
+
+   Only the opacity of the layer moves, which is a compositor-only property and
+   reverses cleanly mid-scroll without leaving anything half-finished. */
+.story-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-color: var(--page);
+}
+
+.story-layer {
+  position: absolute;
+  inset: 0;
+}
+
+/* Two scrims, because the opening and the experience chapters put their text in
+   different places and no single gradient can serve both. They are crossfaded on
+   the first band's progress, so the change of scrim is part of the change of moment
+   rather than an event of its own. Only opacity moves; neither gradient is ever
+   animated, because animating a gradient's colours or a filter is work the
+   compositor cannot do on its own.
+
+   The chapter scrim runs left to right and matches the column the two experiences
+   use. The opening is centred, so it lands in the weakest part of that gradient and
+   over the brightest thing in the frame: the horse's flank, where near-white type
+   measures about 1.7:1. So the opening gets a radial vignette instead.
+
+   Neither is a panel. There is no rectangle and no edge anywhere: the falloff
+   carries the eye to where the text is and then out to the field. The strength is
+   not a matter of taste, it is what puts the small line under the wordmark over
+   4.5:1 on the brightest frame of the clip, which checks/contrast.mjs measures by
+   sampling every frame of every moment. */
+
+.story-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Where the type is not in a left column, the chapter scrim is a bottom-up wash:
+   on a narrow phone because that is where the text sits, and on a phone in
+   landscape because a 390px-tall frame leaves nowhere else to put it. This is the
+   base rule, and the left-hand gradient below is the override for a frame that is
+   both wide and tall. */
+.story-scrim {
+  background-image: linear-gradient(
+    to top,
+    oklch(0.17 0.02 235 / 0.94) 0%,
+    oklch(0.17 0.02 235 / 0.92) 20%,
+    oklch(0.17 0.02 235 / 0.88) 34%,
+    oklch(0.17 0.02 235 / 0.8) 46%,
+    oklch(0.17 0.02 235 / 0.62) 58%,
+    oklch(0.17 0.02 235 / 0.3) 72%,
+    oklch(0.17 0.02 235 / 0.1) 86%,
+    transparent 100%
+  );
+}
+
+/* Landscape on a phone: the wash has only a few hundred pixels to work with, so the
+   type is held lower in it than it is on a tall phone. */
+@media (max-height: 30rem) {
+  .story-scrim {
+    background-image: linear-gradient(
+      to top,
+      oklch(0.17 0.02 235 / 0.96) 0%,
+      oklch(0.17 0.02 235 / 0.94) 26%,
+      oklch(0.17 0.02 235 / 0.9) 44%,
+      oklch(0.17 0.02 235 / 0.82) 58%,
+      oklch(0.17 0.02 235 / 0.64) 70%,
+      oklch(0.17 0.02 235 / 0.34) 82%,
+      oklch(0.17 0.02 235 / 0.12) 92%,
+      transparent 100%
+    );
+  }
+}
+
+/* The opening. Centred on the wordmark rather than on the frame, because the wordmark
+   sits slightly below the middle: it has a line of text under it.
+
+   Declared after the chapter scrim on purpose. Both selectors have the same weight,
+   so the later one wins, and a modifier that lost to its own base class would leave
+   the opening wearing a left-hand gradient it was never meant to have.
+
+   Wide and shallow rather than a tight dark core. A tight core would satisfy the
+   contrast check and still read as a spotlight with a rim, which is the one thing a
+   brand opening must not look like; at this extent the darkening covers the whole
+   middle of the frame and the field stays visible top and bottom, so the picture is
+   dimmed rather than masked. The alphas are set by measurement, not by eye: this is
+   what puts the small line under the wordmark over 4.5:1 against the brightest frame
+   of the clip, and checks/contrast.mjs re-measures all of it by sampling every
+   frame. */
+.story-scrim--opening {
+  background-image: radial-gradient(
+    ellipse 118% 76% at 50% 50%,
+    oklch(0.17 0.02 235 / 0.88) 0%,
+    oklch(0.17 0.02 235 / 0.82) 38%,
+    oklch(0.17 0.02 235 / 0.6) 64%,
+    oklch(0.17 0.02 235 / 0.3) 84%,
+    oklch(0.17 0.02 235 / 0.1) 100%
+  );
+}
+
+/* The chapter scrim runs left to right, matching the column the two experiences
+   use — but only when the frame is tall enough for a column of text to sit in the
+   left third without crowding the subject.
+
+   A phone in landscape is 844px wide, so a width query alone would put it here and
+   hand it the desktop gradient, while its 390px height means the type is actually
+   stacked along the bottom: the wrong gradient for where the text is. Hence
+   `min-height`, and hence the media query that repeats the bottom-up wash below.
+
+   `:not()` rather than a plain class, and it matters: a bare `.story-scrim` rule in
+   a media query has the same weight as the opening modifier declared above it, and
+   being later it would win, handing the opening a left-hand gradient on exactly the
+   widths where its centred wordmark needs the vignette most. */
+@media (min-width: 768px) and (min-height: 31rem) {
+  .story-scrim:not(.story-scrim--opening) {
+    background-image: linear-gradient(
+      100deg,
+      oklch(0.17 0.02 235 / 0.92) 0%,
+      oklch(0.17 0.02 235 / 0.88) 24%,
+      oklch(0.17 0.02 235 / 0.8) 40%,
+      oklch(0.17 0.02 235 / 0.62) 52%,
+      oklch(0.17 0.02 235 / 0.3) 66%,
+      oklch(0.17 0.02 235 / 0.08) 80%,
+      transparent 94%
+    );
+  }
+}
+
+/* The one control on the stage. It is not a bar and it must not become one: a
+   fixed 44px target in the top corner, which is the one region no chapter puts
+   its text in, so it never covers a title or an action.
+
+   Fixed rather than sticky, because it has to stay reachable while the content
+   scrolls underneath it, and the stage it belongs to is taller than the viewport.
+
+   One border in the ordinary state. The second ring in a screenshot of this
+   control was the focus outline, which is a focus state and is left alone: a
+   control you can only find by tabbing to it is a control that does not exist
+   for somebody using a keyboard. The two are separated here so they cannot be
+   confused for one another: a border for the control, an outline for the focus.
+
+   The background is opaque enough to read the icon against whatever frame of
+   video happens to be under it, and the blur on top of that is an improvement
+   rather than the thing making it legible. Where backdrop-filter does not exist
+   the solid background is already there and nothing is lost. */
+.story-control {
+  position: fixed;
+  top: max(0.875rem, env(safe-area-inset-top));
+  right: max(0.875rem, env(safe-area-inset-right));
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 8px;
+  border: 1px solid oklch(0.985 0.004 155 / 0.4);
+  background-color: oklch(0.16 0.022 235 / 0.72);
+  color: var(--media-text);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background-color 180ms var(--ease-out), transform 120ms var(--ease-out);
+}
+
+.story-control:active {
+  transform: scale(0.96);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .story-control {
+    background-color: oklch(0.16 0.022 235 / 0.94);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .story-control:hover {
+    background-color: oklch(0.985 0.004 155 / 0.18);
+  }
+}
+
+/* ── Chapters ──────────────────────────────────────────────────────────────
+   Three moments over the stage, then the gallery and the closing on the page.
+   Each is a full screen of scroll so the crossfade has room to happen while the
+   words of one moment are leaving and the words of the next are arriving.
+
+   The minimum height is in dvh rather than svh on purpose: it matches the height
+   the stage is drawn at, so there is never a strip of page showing under the
+   video when a phone's address bar retracts.
+
+   On a short screen, or in landscape on a phone, the text needs more room than
+   one screen of it, so the minimum is a floor and not a fixed height: the chapter
+   grows, the measurement follows it, and the crossfade moves with it. */
+
+.story-chapter {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 100dvh;
+  padding-top: 5.5rem;
+  padding-bottom: max(2rem, env(safe-area-inset-bottom));
+  /* The same margin scale as .shell, plus the safe area on the sides that have
+     one. A chapter is full-bleed video, but its text is not: it still sits inside
+     the page's measure, because text touching the edge of a screen is text that
+     nobody is comfortable reading. */
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+.story-panel {
+  width: 100%;
+}
+
+@media (min-width: 480px) {
+  .story-chapter {
+    padding-left: max(1.5rem, env(safe-area-inset-left));
+    padding-right: max(1.5rem, env(safe-area-inset-right));
+  }
+}
+
+@media (min-width: 768px) {
+  .story-chapter {
+    align-items: center;
+    padding-bottom: 4rem;
+    padding-left: max(2rem, env(safe-area-inset-left));
+    padding-right: max(2rem, env(safe-area-inset-right));
+  }
+  /* 32rem, not 30. Alfa Slab One is a wide face: "PASSEGGIATE A CAVALLO" set at
+     56px needs about 30rem to break after the first word, and any narrower and
+     the cap lands mid-word. The width is a floor for the type, so it is measured
+     against the type rather than picked. */
+  .story-panel {
+    width: min(32rem, 44vw);
+  }
+}
+
+@media (min-width: 1280px) {
+  .story-chapter {
+    padding-left: max(3rem, env(safe-area-inset-left));
+    padding-right: max(3rem, env(safe-area-inset-right));
+  }
+  /* A 32rem column left against a 2560px screen reads as a line of text that was
+     abandoned rather than a column that was chosen. The measure stops growing and
+     the column stays where the left margin puts it. */
+  .story-panel {
+    width: 32rem;
+  }
+}
+
+/* A short screen, or a phone in landscape: the centred column would put the title
+   behind the only strip of scrim there is, so the panel goes to the bottom and
+   the bottom-up wash carries it. This is not a compromise for small screens, it
+   is where the text belongs on a frame that is 390px tall. */
+@media (min-width: 768px) and (max-height: 31rem) {
+  .story-chapter {
+    align-items: flex-end;
+  }
+}
+
+/* The opening. Centred, because the mark is the subject rather than the
+   offering, which is the one composition on this page where centring is honest.
+   It is kept out of the horse's head and shoulder: the mark sits below the
+   centre line, where all four clips are grass. */
+.story-opening {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.story-opening .story-panel {
+  width: 100%;
+  text-align: center;
+}
+
+/* ── The mark ──────────────────────────────────────────────────────────────
+   One component, two sizes, and no rules that touch the file itself.
+
+   The mark is 700 by 848, so it is vertical and its width is the only number
+   worth choosing: the height follows from the ratio and is never written. That
+   is the whole difference from the typeset wordmark it replaces, which was
+   horizontal and grew from a font-size.
+
+   160px to 280px across the range. The floor is what the opening needs at 320:
+   any narrower and the mark stops being recognisable as a mark and starts being
+   a mark with detail missing. The ceiling is what stops it becoming a poster on
+   a wide screen — at 280px tall the mark is still a name above a line, not a
+   picture competing with the video behind it. */
+.brand-logo {
+  display: block;
+  width: clamp(10rem, 24vw, 17.5rem);
+}
+
+/* The wrapper is the box and the image fills it, so the space is reserved from
+   the width attribute and the ratio before either file has been fetched. That is
+   what stops the opening line being pushed down the screen every time the mark
+   arrives on a slow connection. */
+.brand-logo__mark {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* The footer mark, on the page rather than over the video, so it takes the
+   black file in the light theme and the white one in the dark. 88px is small
+   enough to be a signature and large enough to read the horse in it. */
+.brand-logo--footer {
+  width: 5.5rem;
+}
+
+/* The typeset fallback, in the same box as the file would have occupied. Keeping
+   the box means the opening line stays exactly where it was, so a missing asset
+   costs the drawing and not the layout. */
+.brand-logo--type {
+  display: grid;
+  place-items: center;
+}
+
+.brand-logo__fallback {
+  font-family: 'Alfa Slab One', Georgia, serif;
+  font-size: clamp(1.25rem, 4.5vw, 2rem);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  text-align: center;
+  color: inherit;
+  text-wrap: balance;
+}
+
+/* The h1 is now a box rather than a line of type. It keeps the font rules off the
+   mark itself — a 700 by 848 file has no business being set in Alfa Slab One —
+   and its own height comes from the child's width and ratio. */
+.brand-logo-heading {
+  display: flex;
+  justify-content: center;
+}
+
+.story-opening-line {
+  margin-top: 1.5rem;
+  font-size: clamp(1rem, 2.4vw, 1.125rem);
+  line-height: 1.6;
+  color: oklch(0.985 0.004 155 / 0.88);
+  text-wrap: balance;
+}
+
+.story-opening-est {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: oklch(0.985 0.004 155 / 0.62);
+}
+
+/* Experience titles. 28 to 36px on a phone, 56px on a wide screen, two lines at
+   every width from 768 up for the short titles. The one long title takes its own
+   size below and takes three lines, for a measured reason.
+
+   Sensibly below the wordmark: this is a sentence about an experience, not a
+   name, and a title that arrives at the same size as the brand mark reads as a
+   second brand mark. The scale is capped at 56 rather than at the wordmark's 80
+   for the same reason, and the cap is what holds the two lines at desktop. */
+.story-title {
+  /* Sized against the column rather than against the viewport in general.
+
+     Below 1160 the column is 44vw; above it, a fixed 32rem. And the slab is a wide
+     face: the longest word on this page, PASSEGGIATE, needs 7.9 of its own
+     font-size in width. That is measured, not estimated, and it is what decides
+     this number. Between 768 and 1023 the size is bounded by 44vw / 7.9, which is
+     5.6vw, so 5.5vw with a little margin. Past 1160 the column is 512px and the 56px
+     cap needs 441, so the cap takes over and the title stops growing at all.
+
+     Both halves have to hold, and each of them was wrong on its own at some point.
+     A size tuned at 1440 overflowed the longest word by 37px at 768, where the
+     column is still a share of the viewport; a size tuned at 768 left the title
+     visibly smaller than the 40px the brief asks for on a tablet. */
+  font-size: clamp(1.75rem, 5.5vw, 3.5rem);
+  line-height: 1.12;
+  letter-spacing: 0.01em;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--media-text);
+  text-wrap: balance;
+}
+
+/* The one title that is three words longer than the others, given its own size
+   rather than shrinking every title to suit the longest one: the other two are
+   already right, and a page where every heading is smaller because one of them is
+   longer is a page where nothing is emphasised.
+
+   28px on a 320 phone, then 5vw, capped at 48px. The cap exists because
+   PASSEGGIATE is the longest word on the other titles at 7.9 of its own font-size
+   and the 32rem column has to hold it at 56; this title needs a cap for the same
+   reason, one word longer.
+
+   **It takes three lines, and two is not reachable in this column.** Measured at
+   48px in Alfa Slab One: ADDESTRAMENTO on its own is 507px, and the column is
+   512px. So the word fills the line by itself and "ADDESTRAMENTO E" — which is
+   what two lines would need on the first — measures 555px and does not fit. Forcing
+   it means either about 44px, which leaves 3px of slack against a column width
+   that is a share of the viewport between 768 and 1023 and therefore moves under
+   it, or a wider column, which pushes the text further toward the middle of the
+   frame where the horse is. Three lines is the honest result of a thirteen-letter
+   word in a wide face, and the chapter fits it with room to spare at every width.
+
+   Below 768 the column is the full page measure and the same three lines happen at
+   26px, where the longest word is 275px of 288.
+
+   This is also the tightest text on the page on a phone in landscape. The frame
+   there is 844 by 390, so 5vw is 42px and this is large text needing 3:1; the
+   panel drops to the bottom because a centred column would sit in the one strip of
+   scrim there is, and checks/contrast.mjs measures 3.07:1 — the closest any text
+   here comes to its threshold, precisely because the size is holding it there. One
+   step down would make it normal text needing 4.5:1 and fail. So if the landscape
+   wash above is ever lightened, this is the measurement that fails first. */
+.story-title--tight {
+  font-size: clamp(1.625rem, 5vw, 3rem);
+}
+
+/* 34 to 40 characters, set at 16 to 18px. The measure is in ch because it is the
+   column width that matters and the column is measured against the type, not the
+   other way round. */
+.story-text {
+  margin-top: 1rem;
+  max-width: 36ch;
+  font-size: clamp(1rem, 2.4vw, 1.125rem);
+  line-height: 1.65;
+  color: oklch(0.985 0.004 155 / 0.92);
+}
+
+.story-cta {
+  margin-top: 1.75rem;
+}
+
+/* A phone in landscape is 390px tall, and a 280px-wide mark is 339px of it — the
+   name and its line would not both fit, and the line is the part that says what
+   the maneggio does. The mark is capped by the height it has to share rather than
+   by the width it has, which is the only way a vertical asset behaves on a screen
+   that is wider than it is tall. */
+@media (max-height: 30rem) {
+  .brand-logo {
+    width: min(9.5rem, 30vh);
+  }
+}
+
+/* ── Page sections after the story ─────────────────────────────────────────
+   The gallery and the closing share one surface, the page background, and neither
+   opens with a rule or a change of colour: the video has already become the page
+   by the time either of them is on screen. */
+
+/* 28 to 32px on a phone, 44px on a wide screen. Below the experience titles
+   again, because these are the two headings that follow a full journey rather
+   than introducing anything. */
+.section-title {
+  font-size: clamp(1.75rem, 5.2vw, 2.75rem);
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+/* ── The gallery ───────────────────────────────────────────────────────────
+   The title comes first and the photographs follow it.
+
+   That order was the other way round for a reason that no longer exists. The
+   photographs used to be asked to arrive over a dissolving meadow, and the title
+   underneath them could not be read against a moving frame, so the pictures led
+   and the heading trailed them. The video is finished and behind the page by the
+   time any of this is on screen, so there is nothing left to protect the text
+   from, and the section introduces itself the way every other section does.
+
+   Nine items in three layouts:
+
+     below 768      one column, in the order they are declared
+     768 to 1023    the leading item full width, the other eight in pairs
+     1024 and up    four columns; the leading item takes two of them across two
+                    rows and the other eight fill what is left
+
+   Every cell is filled and nothing is positioned absolutely, because both of those
+   fail as a gap at some width nobody tested.
+
+   `align-items: start` lets each cell keep the proportion it was given instead of
+   being stretched to the row height, which is what stops a portrait plate ending
+   up with dead space inside it. */
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.gallery-frame {
+  display: block;
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--surface);
+}
+
+/* The one mark that sits on a cell.
+
+   A photograph here carries nothing, because a frame or a label over an image says
+   "this is a placeholder" — but nine stills and one moving thing among them, with
+   the moving one looking exactly like the stills, is a cell the visitor has no
+   reason to press. So the clip gets a play disc and the photographs do not.
+
+   Centred rather than bottom-left, because the clip's poster is a full-bleed frame
+   of a paddock and a corner disc would land on the horse or on the child's arms
+   depending on where the poster was cropped, which is a coin toss per width. It is
+   aria-hidden: the button's aria-label already says there is a video, and a drawn
+   glyph read out loud is the same name twice. */
+.gallery-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 999px;
+  background-color: oklch(0.16 0.022 235 / 0.62);
+  color: var(--media-text);
+  box-shadow: 0 0 0 1px oklch(0.985 0.004 155 / 0.35);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  /* The icon is nudged a hair right of true centre, which is optical centring: a
+     triangle's visual mass sits left of its bounding box, and a disc with a
+     triangle dead in the middle reads as slightly off-centre to the eye. */
+  padding-left: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-play {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background-color: oklch(0.16 0.022 235 / 0.82);
+  }
+}
+
+/* 3:4 on a phone.
+
+   Not the originals' own 3:4 for two of them and 4:5 for the third, and not the
+   panoramic plates this grid used to carry: below 768 the cells are full width, so
+   a landscape ratio gives a plate two inches tall and a photograph nobody can see
+   a face in. Every photograph here is vertical, and a portrait cell is what lets a
+   portrait photograph be shown rather than cropped into a strip. */
+.gallery-cell .gallery-frame {
+  aspect-ratio: 3 / 4;
+}
+
+/* A photograph that fails to load still occupies its cell and still says what it
+   was. Without this the cell collapses, the plates beside it jump, and one missing
+   file takes the whole composition down instead of one picture. */
+.gallery-fallback {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  min-height: 8rem;
+  padding: 1rem;
+  background-color: var(--surface);
+  color: var(--muted);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.gallery-caption {
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.gallery-notice {
+  max-width: 58ch;
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+/* The title leads, so the gap belongs under it rather than above: it is the space
+   a heading needs before the thing it names. It closes up on a short screen,
+   where a full gap is most of the viewport. */
+.gallery-heading {
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .gallery-heading {
+    margin-bottom: 2.5rem;
+  }
+}
+
+@media (max-height: 30rem) {
+  .gallery-heading {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  /* Four columns of six, so the leading photograph can take half the row and each
+     supporting one a quarter of it — every ratio below is a whole number of the
+     grid rather than a span that has to be re-derived when the track count
+     changes. */
+  .gallery-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    align-items: start;
+    gap: 1.5rem;
+  }
+
+  /* The item that carries the section takes the full width here, where a half-width
+     cell would be 340px on a tablet and the horse in it would be a thumbnail.
+     4:3 rather than 3:4, because at 736px wide a portrait plate would be 981px
+     tall: more than a screen for one photograph, which turns a section into
+     screens. The focal point keeps the head in the crop. */
+  .gallery-cell--1 {
+    grid-column: 1 / span 6;
+  }
+  .gallery-cell--1 .gallery-frame {
+    aspect-ratio: 4 / 3;
+  }
+
+  /* The other eight pair up. Two columns each, so at 736px a cell is 356px wide
+     and a portrait plate is 475px tall: one screen holds two of them. */
+  .gallery-cell:not(.gallery-cell--1) {
+    grid-column: span 3;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* Four columns. The leading item takes the first two columns across both rows
+     and the other eight fill what is left.
+
+     It spans both rows and *fills* them, rather than carrying a ratio of its own. A
+     ratio has to be guessed from the height of the rows it spans, and that height
+     includes the captions, whose length is a content decision: a guessed 4:5 came
+     out 72px short of the two rows at 1440 and 63px short at 1024, which reads as a
+     hole under the photograph the whole section is built around. Filling the rows
+     cannot be wrong, at any width or with any caption.
+
+     A column flexbox on the figure, not `height: 100%` on the frame. The figure
+     holds both the photograph and its caption, so a frame at 100% of the figure is
+     100% of the figure *plus* the caption underneath it: the photograph overflows
+     the cell and the caption is pushed out of the section. Letting the frame take
+     whatever the caption did not claim is what makes the cell occupy the two rows
+     rather than merely be told to.
+
+     `align-self: stretch` is needed and is not redundant: the rule above sets
+     `align-items: start`, which is what lets the other cells keep their own
+     proportions instead of being stretched to a row height, so this one opts back
+     in. */
+  .gallery-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .gallery-cell--1 {
+    grid-column: 1 / span 2;
+    grid-row: 1 / span 2;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+  }
+  .gallery-cell--1 .gallery-frame {
+    flex: 1 1 auto;
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+
+  /* One column per item again. This is a reset, not a placement, and it is not
+     redundant: the rule above gives every non-leading item `span 3` out of six
+     tracks, and this grid has four. Left in place, each of them still claims three
+     quarters of a row, so exactly one fits per row and the other eight stack below
+     the leading item in a single column — which is not a layout anybody would
+     describe as having been meant. */
+  .gallery-cell:not(.gallery-cell--1) {
+    grid-column: span 1;
+  }
+
+  /* The other eight are placed by the grid, not by this file.
+
+     Once the leading item is pinned to columns 1-2 of rows 1-2, the auto-placement
+     cursor starts at row 1 column 1, finds both columns of the leading item taken,
+     puts the next item in column 3, then column 4, then continues into row 2 —
+     whose first two columns are also occupied by the leading item — and then into
+     row 3. So the composition is: leading item across the top left, two items to its
+     right, two more beneath them, and a full row of four. Nine items, twelve cells,
+     three rows, no gaps.
+
+     That is worth four fewer rules and, more to the point, it is what happens to
+     item ten. The version this replaces named all five positions explicitly and
+     carried a comment warning that auto-placement would be right by accident and
+     wrong the moment a photograph was added between two of them — which is exactly
+     what happened when the section went from five items to nine, and the rules for
+     cells six to nine did not exist. A tenth item now starts row 4 column 1 on its
+     own, which is visible and easy to fix, rather than silently colliding with cell
+     five's explicit coordinates. */
+}
+
+/* ── The closing ───────────────────────────────────────────────────────────
+   Two columns on a wide screen, one on a narrow one, with the action before the
+   secondary links so a phone never puts an address between somebody and the
+   button they came for. */
+
+.closing-grid {
+  display: grid;
+  gap: 3rem;
+}
+
+@media (min-width: 1024px) {
+  .closing-grid {
+    grid-template-columns: 7fr 4fr;
+    gap: 3rem;
+    align-items: start;
+  }
+}
+
+.closing-info {
+  margin-top: 4rem;
+  border-top: 1px solid var(--line);
+}
+
+.closing-info summary {
+  display: flex;
+  min-height: 4rem;
+  cursor: pointer;
+  list-style: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.25rem 0;
+  font-size: 1.125rem;
+  line-height: 1.4;
+}
+
+.closing-info-body {
+  padding-bottom: 0.5rem;
+}
+
+.closing-info .marker {
+  flex-shrink: 0;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.closing-signoff {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 4.5rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--line);
+}
+
+/* Between the gallery's title and the closing there is nothing but air, and air at
+   this size is a hole rather than a pause. The closing starts on the first screen
+   that actually has something on it. */
+#contatti {
+  padding-top: 0;
+}
+
+/* On a short screen — a phone in landscape — a full section of padding is most of
+   the viewport, and the reader gets two words per screen instead of a sentence. The
+   vertical rhythm compresses with the space available rather than staying generous
+   and empty. */
+@media (max-height: 30rem) {
+  .section {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+  .story-chapter {
+    padding-top: 4.5rem;
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+  .story-cta {
+    margin-top: 1.25rem;
+  }
+  .closing-signoff {
+    margin-top: 2.5rem;
+    padding-top: 1.75rem;
+  }
+  .closing-info {
+    margin-top: 2.5rem;
+  }
+}
+
+.closing-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+/* ── Motion ───────────────────────────────────────────────────────────────
+   Four jobs only: atmosphere (the hero video), narration (the entrance and the
+   dissolve between scenes), feedback (press, arrow), continuity (the dialog).
+   Every animation below runs once, or is a transition that can be retargeted
+   mid-flight. Nothing animates height, width or margin. */
+
+/* Entrances.
+
+   The hidden state is opt-in from JavaScript, never from the stylesheet.
+
+   That direction matters more than it looks. A rule that says "anything with
+   .reveal starts at opacity 0" makes the content depend on a script running and
+   on that script having found the element: one typo in an attribute name and the
+   heading is invisible forever, with nothing in the console to say so. So the
+   hidden state hangs off [data-shown='false'], an attribute that only ever exists
+   because useReveal wrote it a frame before the element could be looked at. With
+   no JavaScript, or a script that throws, or a reduced-motion visitor whose
+   observer is never created, every one of these is visible on arrival.
+
+   The transition lives on the base rule rather than on the shown state, so the
+   arrival animates and the hiding does not: an element that gets un-shown (a
+   re-render, a resize) returns without a fade back to invisible.
+
+   240ms and a 16px rise, which is the smallest movement that still reads as an
+   arrival. Nothing here moves a section: only opacity and transform, and only
+   for 240ms. */
+[data-reveal][data-shown='false'] {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+[data-reveal] {
+  transition: opacity 240ms var(--ease-out), transform 240ms var(--ease-out);
+}
+
+[data-reveal][data-shown='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Native <dialog>. @starting-style is what gives an element a before-change
+   style when it enters the top layer, which is the only way to fade a dialog
+   in without unmounting it. */
+dialog {
+  opacity: 0;
+  transform: scale(0.98);
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out),
+    overlay 200ms allow-discrete, display 200ms allow-discrete;
+}
+dialog[open] {
+  opacity: 1;
+  transform: none;
+}
+@starting-style {
+  dialog[open] {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+dialog::backdrop {
+  background-color: oklch(0.16 0.022 235 / 0.6);
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out), overlay 200ms allow-discrete,
+    display 200ms allow-discrete;
+}
+dialog[open]::backdrop {
+  opacity: 1;
+}
+@starting-style {
+  dialog[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+/* The disclosure marker turns rather than grows. */
+summary .marker {
+  transition: transform 180ms var(--ease-out);
+}
+details[open] summary .marker {
+  transform: rotate(45deg);
+}
+
+/* No transition on purpose. This link appears on the very first Tab of every
+   page load, which is a keyboard action repeated all session: animating it
+   delays the thing the visitor pressed Tab to reach. */
+.skip-link {
+  @apply fixed left-6 top-2 z-skip -translate-y-[200%] rounded-control bg-accent px-4 py-3 font-medium text-on-accent no-underline;
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* Hover is for pointers. A device that reports `hover: hover` without a fine
+   pointer is being driven by a keyboard or a switch, and there the hover state
+   sticks after the press, which reads as a control stuck down. */
+@media (hover: hover) and (pointer: fine) {
+  .pill--line:hover {
+    @apply border-accent text-accent;
+  }
+  .pill--solid:hover {
+    background-color: color-mix(in oklab, var(--accent) 88%, black);
+  }
+  .pill--media:hover {
+    background-color: oklch(0.94 0.008 155);
+  }
+  .pill--outline-media:hover {
+    background-color: oklch(0.985 0.004 155 / 0.16);
+  }
+  /* The arrow says "this goes somewhere" without moving the label. */
+  .arrow {
+    transition: transform 160ms var(--ease-out);
+  }
+  a:hover .arrow,
+  button:hover .arrow {
+    transform: translateX(3px);
+  }
+  .nav-link:hover {
+    color: var(--accent);
+  }
+  .prose-link:hover {
+    color: color-mix(in oklab, var(--accent) 85%, black);
+  }
+  .closing-link:hover {
+    color: var(--accent);
+  }
+}
+
+/* Reduced motion is not a softer version of the page, it is the same page with
+   the movement taken out: no reveal, no crossfade, no autoplay, no smooth
+   scroll. Everything is visible on arrival. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  /* Belt and braces. The attributes are never written under reduced motion, so
+     this rule should never match; it is here so that a visitor who turns the
+     preference on mid-session cannot be left with a block that is registered but
+     not yet shown. */
+  [data-reveal][data-shown='false'] {
+    opacity: 1;
+    transform: none;
+  }
+}

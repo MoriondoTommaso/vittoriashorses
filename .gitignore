@@ -1,0 +1,41 @@
+# Dependencies and build output
+node_modules/
+dist/
+
+# Review artefacts
+review-shots/
+
+# Media sources. The repository tracks only what the site is built from, which is
+# src/ and public/: the build never reads any of these, and a checkout without
+# them produces a byte-identical dist/.
+#
+#   videos/              35 MB, the eight original story clips
+#   maneggio_pictures/  5.5 MB, the nine gallery items, photographs and one clip
+#   logo/                 240 KB, the official mark, black and white
+#   figure/               17 MB, six generated plates from the earlier version
+#   assets/             9.6 MB, the earlier Pexels set, unused by the site
+#
+# scripts/build-media.mjs and scripts/build-gallery.mjs read videos/,
+# maneggio_pictures/ and logo/, so `npm run media` and `npm run gallery` cannot
+# run from a fresh clone. That is deliberate: the published media is already in
+# public/media/, and regenerating it is a deliberate act on a working copy rather
+# than something a deploy does. Keep the originals somewhere safe.
+videos/
+maneggio_pictures/
+logo/
+figure/
+assets/
+
+# Editors and OS
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Jekyll leftovers from the previous version of this site, kept only so a
+# half-finished checkout does not commit them by accident.
+_site/
+.jekyll-cache
+.jekyll-metadata
+.bundle/
+vendor/

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vittoria’s Horses | Equitazione e doma a Terni</title>
+    <meta
+      name="description"
+      content="Addestramento e doma di cavalli, lezioni di equitazione e passeggiate a Terni. Contatta Alberto per informazioni e disponibilità."
+    />
+    <link rel="canonical" href="https://vittoriashorses.it/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Vittoria’s Horses" />
+    <meta property="og:title" content="Vittoria’s Horses | Equitazione e doma a Terni" />
+    <meta
+      property="og:description"
+      content="Addestramento e doma di cavalli, lezioni di equitazione e passeggiate a Terni. Contatta Alberto per informazioni e disponibilità."
+    />
+    <meta property="og:url" content="https://vittoriashorses.it/" />
+    <meta property="og:locale" content="it_IT" />
+    <!-- Absolute, because a crawler resolves this outside the page it came from. -->
+    <meta property="og:image" content="https://vittoriashorses.it/media/og.webp" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <!-- This one is a generated illustration, so the alt describes the picture
+         and names no region. The previous alt said "campagna toscana" while the
+         maneggio is in Umbria, which was both the wrong place and an implicit
+         claim that the file photographs somewhere real. -->
+    <meta
+      property="og:image:alt"
+      content="Illustrazione di un cavallo baio al pascolo in un campo."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <!-- The opening poster is the largest thing on the page, and it is also what
+         the visitor sees while the clip is still arriving, so it decides the
+         largest contentful paint. It lives in the React tree, and without this the
+         browser could not ask for it until the bundle had downloaded, parsed and
+         run: the poster would wait on the script instead of running alongside it.
+
+         One preload per orientation, so only the frame that matches the viewport is
+         fetched. The clip itself is deliberately not preloaded. -->
+    <link
+      rel="preload"
+      as="image"
+      href="./media/fermo-poster-mobile.webp"
+      media="(max-width: 767px)"
+      fetchpriority="high"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="./media/fermo-poster.webp"
+      media="(min-width: 768px)"
+      fetchpriority="high"
+    />
+    <!-- The opening mark, preloaded.
+
+         It is the largest contentful element on the page now, and it is an SVG the
+         browser cannot discover until the bundle has downloaded, parsed and run:
+         the name used to be set in the page's own type, which needed nothing but
+         the stylesheet, so switching to the official mark put a 28 kB file at the
+         end of the critical path. Preloading moves it into the first group of
+         requests, beside the poster, where it downloads in parallel instead of
+         after.
+
+         Only the white file. The opening sits on the darkened video in both themes,
+         so the white mark is the only one that can ever appear there, and preloading
+         the black one as well would spend 28 kB on a footer image that most
+         visitors have not scrolled to. That file is selected by a `<picture>` source
+         instead, which the browser evaluates without a request. -->
+    <link
+      rel="preload"
+      as="image"
+      href="./media/logo-white.svg"
+      fetchpriority="high"
+    />
+    <!-- The two faces, preloaded.
+
+         The wordmark is the largest text on the page and it is set in Alfa Slab One,
+         so that file is what decides the first paint of the headline. Neither face
+         can be discovered before the stylesheet has downloaded, which on a slow
+         connection puts them behind the bundle on the same pipe; preloading moves
+         both into the first group of requests instead of the second.
+
+         Alfa Slab One first because it is the one the largest contentful element is
+         set in, then Plus Jakarta Sans because the line under the wordmark needs it
+         in the same paint. Both are latin subsets, self-hosted, and about 39 KB
+         together, which is why they are preloaded at all: two files small enough to
+         arrive before first paint are worth the request, and a third would not be.
+
+         font-display stays swap. The preload improves the common case; the fallback
+         still covers a file that does not arrive in time. -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="./src/fonts/alfa-slab-one-latin.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="./src/fonts/plus-jakarta-sans-latin.woff2"
+      crossorigin
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,60 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# The build has to happen on the runner and not in a committed dist/: the
+# published media is already in public/, so the build needs nothing but npm,
+# and a branch carrying 32 MB of build output would be a second copy of assets
+# that already exist in public/media/.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time, and a newer push wins.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # tsc --noEmit && vite build. The typecheck is part of the build rather
+      # than a separate step because that is where it lives locally, and a
+      # deploy that skips the check the developer runs is not the same deploy.
+      # No ffmpeg and no cwebp: scripts/build-media.mjs and build-gallery.mjs
+      # produce public/media/, which is committed.
+      - name: Build
+        run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
