@@ -33,7 +33,7 @@ const stillUsable = (page) =>
       /* A phone number is now the most direct route on the page, and it is a link
          like any other, so it is checked with the social profile: a page that kept
          its Instagram but lost its telephone would still pass on instagram alone. */
-      tel: hrefs.some((h) => h && h.startsWith('tel:+393493287355')),
+      tel: hrefs.some((h) => h && h.startsWith('tel:+393492387355')),
       /* An image that failed must not be the only carrier of the message, so no
          image may carry a short or missing description. alt="" is the correct way
          to mark an image as decorative (the story posters, whose meaning comes

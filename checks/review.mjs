@@ -291,7 +291,7 @@ for (const width of WIDTHS) {
   if (facts.markWidth < 150 || facts.markWidth > 300) {
     note(`${width}px`, `the opening mark is ${facts.markWidth}px wide, outside 150-300`)
   }
-  if (facts.telHref !== 'tel:+393493287355') note(`${width}px`, `the telephone link is ${facts.telHref}`)
+  if (facts.telHref !== 'tel:+393492387355') note(`${width}px`, `the telephone link is ${facts.telHref}`)
   if (facts.telTarget !== null) note(`${width}px`, `the telephone link opens a tab (target=${facts.telTarget})`)
   if (!/Chiama Alberto/.test(facts.telText)) note(`${width}px`, `the telephone link reads "${facts.telText}"`)
   if (/instagram/i.test(facts.telText)) note(`${width}px`, 'the telephone link says "su Instagram"')

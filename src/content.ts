@@ -166,8 +166,8 @@ export const social = {
  */
 export const contact = {
   person: 'Alberto',
-  phone: '+39 349 328 7355',
-  phoneHref: 'tel:+393493287355',
+  phone: '+39 349 238 7355',
+  phoneHref: 'tel:+393492387355',
 }
 
 /* ── The story backdrop ────────────────────────────────────────────────────
@@ -632,7 +632,7 @@ export const closing = {
       {
         question: 'Come richiedo informazioni?',
         answer:
-          'Puoi chiamare Alberto al +39 349 328 7355 oppure scrivere su Instagram. Ti rispondiamo con informazioni e disponibilità.',
+          'Puoi chiamare Alberto al +39 349 238 7355 oppure scrivere su Instagram. Ti rispondiamo con informazioni e disponibilità.',
       },
       {
         question: 'Posso partecipare se non ho mai montato?',
