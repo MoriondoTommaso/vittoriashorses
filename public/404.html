@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pagina non trovata | Vittoria’s Horses</title>
+    <!-- Noindex, and deliberately permanent rather than transient.
+
+         A crawler that lands here has followed a link that no longer resolves, and
+         the fix is the link, not the page. Letting it be indexed is how a 404
+         becomes an entry in a search result, and `noindex` is the instruction that
+         says so to whichever crawler asks. `noindex, follow` rather than
+         `nofollow`: the links on this page are real and useful, and a crawler
+         should be able to reach the home page and the privacy notice from here. -->
+    <meta name="robots" content="noindex, follow" />
+    <meta
+      name="description"
+      content="La pagina richiesta non esiste. Torna alla pagina di Vittoria’s Horses o scrivici per informazioni su addestramento e doma, lezioni di equitazione e passeggiate a Terni."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Pagina non trovata | Vittoria’s Horses" />
+    <!-- generated:head -->
+    <!-- generated:head -->
+    <!-- The stylesheet is injected by scripts/build-metadata.mjs, between the
+         markers above.
+
+         It cannot be written here. `privacy.html` is a Vite entry point, so its
+         `/src/index.css` link is rewritten to the hashed, bundled file at build
+         time; a file in `public/` is copied verbatim and never processed, so a
+         path written in it would ship as `/src/index.css` and 404 — an unstyled
+         error page, served to exactly the visitor who has just hit a broken
+         link. -->
+  </head>
+  <body>
+    <a class="skip-link" href="#contenuto">Vai al contenuto</a>
+
+    <header class="border-b border-line bg-surface">
+      <div class="shell flex min-h-16 items-center justify-between gap-6">
+        <a
+          class="inline-flex min-h-11 items-center text-base font-medium text-ink no-underline"
+          href="./index.html"
+        >
+          Vittoria’s Horses
+        </a>
+        <a class="pill pill--line min-h-11 px-5" href="./index.html#contatti">Contatti</a>
+      </div>
+    </header>
+
+    <main id="contenuto" tabindex="-1" class="shell py-16 md:py-24">
+      <!-- 404 as a heading, not as a display.
+
+           It is the one thing on this page that a screen reader has to announce
+           out of context, and "404" alone is a code rather than a sentence. The
+           sentence is what a person needs; the number is there for anyone who
+           arrived looking for it. The visible heading is therefore the sentence,
+           and the code sits above it as a quiet line of small print. -->
+      <p class="text-sm font-medium uppercase tracking-wide text-muted">Errore 404</p>
+      <h1 class="mt-4 max-w-[20ch] text-[clamp(2rem,4.5vw,3.25rem)] leading-[1.1]">
+        Questa pagina non esiste
+      </h1>
+
+      <p class="mt-6 max-w-[58ch] text-xl leading-relaxed text-muted">
+        L’indirizzo è sbagliato o la pagina è stata spostata. Puoi tornare alla pagina
+        principale oppure chiamarci: se stavi cercando informazioni su un’attività o sulla
+        disponibilità, ci rispondiamo volentieri.
+      </p>
+
+      <!-- `pill--solid` is the modifier that supplies a background; `.pill` on its
+           own is only the shape, and an anchor left with the base class renders as
+           invisible text with padding around it. The closing section of the home
+           page gets this right already, so the pair here matches that one. -->
+      <div class="mt-10 flex flex-wrap items-center gap-4">
+        <a class="pill pill--solid min-h-11 px-6" href="./index.html">Torna al sito</a>
+        <a class="pill pill--line min-h-11 px-6" href="./index.html#contatti">Contatti</a>
+      </div>
+
+      <!-- The four activities are listed rather than left as a single "go back".
+
+           A visitor who arrives here from a stale link was looking for something, and
+           the most likely candidates are the four things the maneggio does. Naming
+           them turns a dead end into four working anchors, and each one is a real
+           fragment on the home page. -->
+      <nav class="mt-16 max-w-[52ch]" aria-labelledby="cosa-cerchi">
+        <h2 id="cosa-cerchi" class="text-lg font-semibold leading-snug">Cosa cercavi</h2>
+        <ul class="mt-4 space-y-1">
+          <li><a class="prose-link" href="./index.html#addestramento">Addestramento e doma di cavalli</a></li>
+          <li><a class="prose-link" href="./index.html#lezioni">Lezioni di equitazione</a></li>
+          <li><a class="prose-link" href="./index.html#passeggiate">Passeggiate a cavallo</a></li>
+          <li><a class="prose-link" href="./index.html#contatti">Contatti e informazioni</a></li>
+        </ul>
+      </nav>
+    </main>
+
+    <footer class="border-t border-line py-12">
+      <div class="shell flex flex-wrap items-center justify-between gap-4">
+        <a class="inline-flex min-h-11 items-center text-ink no-underline" href="./index.html"
+          >Vittoria’s Horses</a
+        >
+        <a class="text-sm text-muted no-underline" href="./privacy.html">Privacy</a>
+      </div>
+    </footer>
+  </body>
+</html>

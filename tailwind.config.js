@@ -1,7 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  /* privacy.html is a second entry: without it its classes are never generated. */
-  content: ['./index.html', './privacy.html', './src/**/*.{ts,tsx}'],
+  /* privacy.html is a second entry: without it its classes are never generated.
+     So is public/*.html, which is where 404.html lives: it is copied to dist
+     verbatim rather than built as an entry, so nothing else would put its classes
+     in the stylesheet and a utility used only there would be silently absent. */
+  content: [
+    './index.html',
+    './privacy.html',
+    './public/*.html',
+    './src/**/*.{ts,tsx}',
+  ],
   theme: {
     extend: {
       /* Semantic tokens only. The values live in src/index.css so home and

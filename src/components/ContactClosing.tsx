@@ -1,5 +1,5 @@
 import { ArrowRight, MapPin } from 'lucide-react'
-import { closing, contact, mediaNotice, site, social } from '../content'
+import { closing, contact, mediaNotice, pendingFacts, site, social } from '../content'
 import { BrandLogo } from './BrandLogo'
 
 /**
@@ -156,6 +156,19 @@ export function ContactClosing() {
                 Privacy
               </a>
             </li>
+            {/* The fiscal identifier, when there is one.
+
+                Rendered only once confirmed, because an empty or placeholder
+                identifier in a footer is worse than none: Italian commercial
+                sites are expected to carry it, and a reader who goes looking for
+                one and finds a blank space learns less than a reader who never
+                looks. Gated on the same flag the privacy notice reads, so
+                confirming it once puts it in both places. */}
+            {pendingFacts.legalId.confirmed && pendingFacts.legalId.value ? (
+              <li className="text-muted">
+                {pendingFacts.legalId.kind} {pendingFacts.legalId.value}
+              </li>
+            ) : null}
           </ul>
         </div>
       </div>

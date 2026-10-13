@@ -8,30 +8,18 @@
       name="description"
       content="Addestramento e doma di cavalli, lezioni di equitazione e passeggiate a Terni. Contatta Alberto per informazioni e disponibilità."
     />
-    <link rel="canonical" href="https://vittoriashorses.it/" />
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Vittoria’s Horses" />
-    <meta property="og:title" content="Vittoria’s Horses | Equitazione e doma a Terni" />
-    <meta
-      property="og:description"
-      content="Addestramento e doma di cavalli, lezioni di equitazione e passeggiate a Terni. Contatta Alberto per informazioni e disponibilità."
-    />
-    <meta property="og:url" content="https://vittoriashorses.it/" />
-    <meta property="og:locale" content="it_IT" />
-    <!-- Absolute, because a crawler resolves this outside the page it came from. -->
-    <meta property="og:image" content="https://vittoriashorses.it/media/og.webp" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <!-- This one is a generated illustration, so the alt describes the picture
-         and names no region. The previous alt said "campagna toscana" while the
-         maneggio is in Umbria, which was both the wrong place and an implicit
-         claim that the file photographs somewhere real. -->
-    <meta
-      property="og:image:alt"
-      content="Illustrazione di un cavallo baio al pascolo in un campo."
-    />
-    <meta name="twitter:card" content="summary_large_image" />
-    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <!-- The canonical URL, the Open Graph tags and the Twitter card are generated
+         by scripts/build-metadata.mjs from src/headMeta.ts, between the markers
+         below. They are not written here by hand because both pages need an
+         identical set and privacy.html was missing the description, the image
+         and the card type, which is why a shared privacy link rendered with no
+         picture and no summary.
+
+         Absolute URLs, because a crawler resolves these outside the page it came
+         from. The og:image dimensions are read from the file rather than typed,
+         which is how a 1200x628 image came to be declared as 1200x630. -->
+    <!-- generated:head -->
+    <!-- generated:head -->
     <!-- The opening poster is the largest thing on the page, and it is also what
          the visitor sees while the clip is still arriving, so it decides the
          largest contentful paint. It lives in the React tree, and without this the

@@ -170,6 +170,68 @@ export const contact = {
   phoneHref: 'tel:+393492387355',
 }
 
+/* ── The origin ───────────────────────────────────────────────────────────
+   Where the site actually lives.
+
+   Needed because the structured data, the sitemap and the canonical URLs are
+   all read by something outside the page — a crawler resolving a link in an
+   answer, a social card renderer, a search index — and those readers have no
+   document to resolve a relative path against. `absolute()` is the one place
+   that knowledge is written down. */
+export const siteOrigin = 'https://vittoriashorses.it'
+
+/** Deploy-relative to absolute, for anything a crawler or a card reads. */
+export const absolute = (path: string) => new URL(path, `${siteOrigin}/`).href
+
+/**
+ * Where the maneggio is, as one object.
+ *
+ * The street address was written twice — once here for the visible line and
+ * once in App.tsx for the structured data — which is the same failure mode as
+ * two phone numbers: a correction made in one place leaves the other lying. It
+ * is declared here once and read by both.
+ *
+ * Split into parts rather than kept as the single string the visitor reads,
+ * because schema.org needs them separately and a parser cannot recover
+ * "Strada di Sabione 129, Terni" into a street and a town without guessing
+ * which comma is which. */
+export const location = {
+  streetAddress: 'Strada di Sabione 129',
+  addressLocality: 'Terni',
+  addressRegion: 'Umbria',
+  addressCountry: 'IT',
+  /** The composed form, for the one place that shows an address to a reader. */
+  get address() {
+    return `${this.streetAddress}, ${this.addressLocality}`
+  },
+}
+
+/**
+ * The facts the maneggio has not confirmed yet.
+ *
+ * Each one is a flag beside the value it guards, and every consumer treats
+ * false as "absent" rather than as "zero" or "empty string": a LocalBusiness
+ * carrying an invented field is worse than one carrying fewer, and an
+ * `openingHoursSpecification` of `[]` reads to a crawler as a business that is
+ * definitively closed, which is a different claim from one that is not stated.
+ *
+ * So nothing here renders until Alberto confirms it, and confirming one is
+ * flipping a boolean rather than writing a component and hoping the string
+ * matches. This is the same pattern `site.establishedConfirmed` uses. */
+export const pendingFacts = {
+  /** Strada di Sabione 129 is confirmed; the point on the map is not. */
+  geo: { latitude: null as number | null, longitude: null as number | null, confirmed: false },
+
+  /** No day or hour has been stated by the maneggio. */
+  openingHours: { confirmed: false as const, days: [] as string[], opens: '', closes: '' },
+
+  /** Needed to identify the data controller under GDPR art. 13. */
+  legalId: { value: '', confirmed: false as const, kind: 'P.IVA' as 'P.IVA' | 'C.F.' },
+
+  /** Required for a simple channel to exercise data subject rights (art. 12). */
+  privacyEmail: { value: '', confirmed: false },
+}
+
 /* ── The story backdrop ────────────────────────────────────────────────────
    Four moments, one continuous stage, in the order a horse moves: standing, at
    a walk, at a trot, at a gallop. Each clip exists in two orientations and each
@@ -611,7 +673,7 @@ export const closing = {
   }[],
   location: {
     confirmed: true,
-    address: 'Strada di Sabione 129, Terni',
+    address: location.address,
     /* The link the maneggio supplied, not a search for its address.
        A search URL and a place URL are not the same thing: the first is a search
        that returns whatever the engine decides, the second is a point somebody

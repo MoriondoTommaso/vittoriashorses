@@ -8,14 +8,12 @@
       name="description"
       content="Come Vittoria’s Horses gestisce i dati personali nel sito web: nessun cookie di profilazione, nessun servizio di analytics, nessun modulo di raccolta dati."
     />
-    <link rel="canonical" href="https://vittoriashorses.it/privacy.html" />
-    <meta property="og:type" content="article" />
-    <meta property="og:site_name" content="Vittoria’s Horses" />
-    <meta property="og:title" content="Privacy | Vittoria’s Horses" />
-    <meta property="og:url" content="https://vittoriashorses.it/privacy.html" />
-    <meta property="og:locale" content="it_IT" />
-    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/src/index.css" />
+    <!-- generated:head -->
+    <!-- generated:head -->
+    <!-- No stylesheet link here, and that is not an oversight: this page loads no
+         JavaScript, so Vite never sees the import that would bundle the CSS for
+         it. The link is injected by scripts/build-metadata.mjs, between the
+         markers above, from the same build output `index.html` references. -->
   </head>
   <body>
     <a class="skip-link" href="#contenuto">Vai al contenuto</a>
@@ -39,6 +37,45 @@
         fonte di dati trattati dagli strumenti pubblicati dal maneggio.
       </p>
 
+      <!-- The summary, before the notice.
+
+           A reader who arrived worried about tracking should be able to get the
+           answer in one sentence rather than reading eleven sections to reach it.
+           This is also the paragraph that makes the absence of a cookie banner
+           legible as a decision rather than an oversight, which matters: a site
+           with no banner is only reassuring if it says why there is none. -->
+      <div
+        class="mt-10 max-w-[58ch] rounded-control border border-line bg-surface p-6 md:p-8"
+        role="note"
+        aria-labelledby="in-sintesi"
+      >
+        <h2 id="in-sintesi" class="text-xl font-semibold leading-snug">In sintesi</h2>
+        <p class="mt-3 leading-relaxed text-muted">
+          Il sito non imposta cookie, non usa strumenti di analytics, non incorpora contenuti
+          di terzi e non raccoglie dati con moduli. Chi lo visita senza scrivere al maneggio
+          non lascia alcun dato. Per questo non c’è un banner di consenso: non ci sono
+          trattamenti che richiedano consenso. I dati che il maneggio tratta sono soltanto
+          quelli che una persona le invia per chiedere informazioni.
+        </p>
+      </div>
+
+      <!-- The notice, rendered from src/privacy.ts by scripts/build-metadata.mjs.
+
+           The block below is generated, between the markers, and this comment is
+           what stays when it is replaced.
+
+           Generated rather than written, because every fact in it — the address,
+           the phone number, the two social profiles, the hosting provider — also
+           appears elsewhere on the site, and a notice carrying its own copies of
+           those is a notice that starts contradicting the site the first time a
+           detail changes. The sections are ordered as GDPR article 13 presents
+           them, which is also the order a reader is expected to look in.
+
+           This cannot be rendered by React: privacy.html loads no JavaScript at
+           all, deliberately, so that a visitor who blocks scripts still reads the
+           whole notice. A client-rendered notice would be readable only by the
+           people least likely to be reading it. -->
+      <!-- generated:notice -->
       <div class="mt-10 max-w-[58ch] space-y-9">
         <section>
           <h2 class="text-[1.5rem] leading-snug">Titolare del trattamento</h2>
@@ -120,8 +157,12 @@
           </p>
         </section>
 
-        <p class="text-sm text-muted">Ultimo aggiornamento: 2 ottobre 2026.</p>
+        <p class="text-sm text-muted">
+          Ultimo aggiornamento:
+          <time datetime="2026-10-13">13 ottobre 2026</time>.
+        </p>
       </div>
+      <!-- generated:notice -->
     </main>
 
     <footer class="border-t border-line py-12">

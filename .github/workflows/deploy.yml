@@ -35,9 +35,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # tsc --noEmit && vite build. The typecheck is part of the build rather
-      # than a separate step because that is where it lives locally, and a
-      # deploy that skips the check the developer runs is not the same deploy.
+      # tsc --noEmit && vite build, then the two generators. The typecheck is
+      # part of the build rather than a separate step because that is where it
+      # lives locally, and a deploy that skips the check the developer runs is
+      # not the same deploy.
+      #
+      # `prerender.mjs` and `build-metadata.mjs` are not optional: the page body,
+      # the JSON-LD, the social cards, the sitemap, robots.txt and llms.txt are all
+      # written after vite build, and without them a crawler that does not run
+      # JavaScript receives an empty document. Both fail the build rather than
+      # warning, so a broken generator cannot ship.
+      #
       # No ffmpeg and no cwebp: scripts/build-media.mjs and build-gallery.mjs
       # produce public/media/, which is committed.
       - name: Build
