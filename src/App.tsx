@@ -4,7 +4,6 @@ import { Opening, StoryChapters } from './components/StoryChapters'
 import { Gallery } from './components/Gallery'
 import { ContactClosing } from './components/ContactClosing'
 import { useReveal } from './hooks/useReveal'
-import { closing, contact, site, social } from './content'
 
 export default function App() {
   useReveal()
@@ -37,52 +36,22 @@ export default function App() {
         <ContactClosing />
       </main>
 
-      {/* Only confirmed data. The maneggio has confirmed a person, a telephone
-          number, a street address and two profiles, and nothing else: no opening
-          days, no prices, no coordinates, no reviews, no qualifications. Those are
-          absent rather than approximated, because a LocalBusiness carrying an
-          invented field is worse than an Organization carrying fewer.
+      {/* The structured data is deliberately NOT rendered here.
 
-          `LocalBusiness` and not `Organization`, because an address and a
-          telephone number are what make this a place rather than a brand, and the
-          street is carried as a PostalAddress because a place without one cannot
-          be routed to. hasMap holds the link the maneggio supplied: a map URL is a
-          fact about the place, where an embedded map would be a third-party frame
-          on an otherwise first-party page. */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@graph': [
-              {
-                '@type': 'LocalBusiness',
-                name: site.name,
-                description: site.description,
-                url: 'https://vittoriashorses.it',
-                /* E.164 without the scheme, which is the form schema.org defines.
-                    Read from the one place the number is written, so the metadata
-                    and the visible link cannot drift apart. */
-                telephone: contact.phoneHref.replace('tel:', ''),
-                address: {
-                  '@type': 'PostalAddress',
-                  streetAddress: 'Strada di Sabione 129',
-                  addressLocality: 'Terni',
-                  addressCountry: 'IT',
-                },
-                hasMap: closing.location.mapsUrl,
-                sameAs: [social.instagram, social.facebook],
-              },
-              {
-                '@type': 'WebSite',
-                name: site.name,
-                url: 'https://vittoriashorses.it',
-                inLanguage: 'it',
-              },
-            ],
-          }),
-        }}
-      />
+          `scripts/prerender.mjs` writes it into `<head>` at build time, from the
+          same `structuredData.ts` module this would have read. It is not in this
+          tree because a crawler that does not run JavaScript never receives
+          anything React renders, and the whole reason the graph exists is for
+          those crawlers.
+
+          It also has to stay out of the body: an element present in the prerendered
+          document and absent from the client render is a hydration mismatch, and
+          React's response to one is to throw away the prerender and re-render
+          everything from scratch — which silently undoes the fix this graph is
+          for. It has to stay out of `<head>` for the same reason: `App` renders
+          into `#root`, and a node React does not own must not live there.
+
+          One owner, one place. */}
     </>
   )
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { logo, site } from '../content'
 
 /**
@@ -40,6 +40,27 @@ export function BrandLogo({
   className?: string
 }) {
   const [failed, setFailed] = useState(false)
+  const ref = useRef<HTMLImageElement>(null)
+
+  /* Adopt a mark that already failed.
+     The document is prerendered, so the browser starts fetching the mark while the
+     bundle is still downloading, and a file that is blocked or 404s has raised its
+     `error` event before React attaches the handler below. Nothing then ever sets
+     `failed`, the mark's box collapses, and the page loses the one thing this
+     fallback exists to preserve: its name.
+
+     `complete` is true for an image that finished loading *and* for one that
+     failed, which is exactly why `naturalWidth` has to be consulted as well — it
+     is 0 when there are no pixels, so it is what distinguishes a drawn mark from
+     a hole. The same check the stage uses on its posters, for the same reason.
+
+     `useEffect` rather than a check during render, because reading the DOM during
+     render is not something React allows a component to do and doing it in a
+     layout pass would make the first paint depend on an image load. */
+  useEffect(() => {
+    const image = ref.current
+    if (image?.complete && image.naturalWidth === 0) setFailed(true)
+  }, [])
 
   if (failed) {
     return (
@@ -56,6 +77,7 @@ export function BrandLogo({
   const source = logo.white
   const mark = (
     <img
+      ref={ref}
       src={source.src}
       width={source.width}
       height={source.height}

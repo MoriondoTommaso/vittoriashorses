@@ -49,7 +49,10 @@ export function StoryStage({
   children: React.ReactNode
 }) {
   const playback = usePlayback()
-  const { ready, markReady } = useReadyPosters(playback.variant)
+  /* Declared before the hook that reads it, so the ref exists when that hook
+     initialises rather than a statement later. */
+  const posterRefs = useRef<(HTMLImageElement | null)[]>([])
+  const { ready, markReady } = useReadyPosters(playback.variant, posterRefs)
 
   /* Under reduced motion the bands become steps and the stage shows one poster at
      a time. The layout, the order and every word are unchanged. */
@@ -368,16 +371,31 @@ export function StoryStage({
                 stageRefs.current.layers[index] = element
               }}
             >
+              {/* The poster for one moment.
+
+                  `fetchpriority` is set only on the opening poster: it competes
+                  for bandwidth, while the other three are fetched while the
+                  reader is still on the first moment.
+
+                  Lowercase and cast, which is the only combination that works on
+                  this version. `fetchPriority` is React 19's camelCase name:
+                  written literally it is an "unrecognized prop" warning on every
+                  render, and that warning lands in the prerender step's build
+                  output. `fetchpriority` is the attribute React passes straight
+                  through and the one the browser reads, but React 18.3's types
+                  do not declare it, hence the cast. The DOM result is identical
+                  either way. */}
               <img
+                ref={(element) => {
+                  posterRefs.current[index] = element
+                }}
                 src={clip.poster}
                 width={clip.width}
                 height={clip.height}
                 alt=""
                 decoding="async"
-                /* Only the opening poster competes for bandwidth; the other three are
-                   fetched while the reader is still on the first moment. */
-                fetchPriority={index === 0 ? 'high' : 'auto'}
                 loading={index === 0 ? 'eager' : 'lazy'}
+                {...({ fetchpriority: index === 0 ? 'high' : 'auto' } as Record<string, string>)}
                 onLoad={() => markReady(index)}
                 /* A clip that cannot be decoded does not count as ready. The poster
                    stays underneath and carries the layer, which is the same state as

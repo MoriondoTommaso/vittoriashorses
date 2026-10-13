@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import { useMotionValueEvent, useScroll, useTransform, type MotionValue } from 'motion/react'
 import { clips, type StoryMoment } from '../content'
 
@@ -491,7 +491,10 @@ export function useActiveState(
  * counts as ready, and an image that errors is treated as ready too: it has
  * settled, it simply has nothing to show, and the frame below carries on.
  */
-export function useReadyPosters(variant: Variant): {
+export function useReadyPosters(
+  variant: Variant,
+  posters: RefObject<(HTMLImageElement | null)[]>,
+): {
   ready: boolean[]
   markReady: (index: number) => void
 } {
@@ -524,6 +527,37 @@ export function useReadyPosters(variant: Variant): {
     },
     [variant],
   )
+
+  /* Adopt posters that are already decoded.
+
+     Without this the stage waits for a `load` event that will never arrive, and
+     no clip is ever given a source. The page still looks right — the poster is
+     what carries the layer — so the failure is a stage that never moves.
+
+     Why the event has already gone: the document is prerendered, so the poster
+     is in the HTML and the browser starts decoding it while the bundle is still
+     downloading. On a warm cache it is decoded before React hydrates, so the
+     `onLoad` this hook is driven by fires before the handler is attached. A
+     listener attached after the event has fired hears nothing.
+
+     `complete` is the answer to that, and it is the right question to ask rather
+     than a proxy for it: true when the image is fully available for rendering,
+     which includes the cached-and-decoded case and the not-yet-started one, and
+     the two are distinguished by `naturalWidth`, which is 0 until there are real
+     pixels to report. An image that failed also has `complete` true, so the
+     width test is what keeps a broken poster from counting as a ready frame.
+
+     This runs once on mount and on no other trigger, because it adopts state
+     that already exists rather than observing anything that can change. */
+  useEffect(() => {
+    const images = posters.current
+    if (!images) return
+    for (let index = 0; index < images.length; index += 1) {
+      const image = images[index]
+      if (image?.complete && image.naturalWidth > 0) markReady(index)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [posters, variant])
 
   return { ready, markReady }
 }
